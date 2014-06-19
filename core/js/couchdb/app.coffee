@@ -34,6 +34,7 @@ adhocLineTasksReport = require('./adhoc/line-tasks-report')
 adhocSetShiftingDetailReport = require('./adhoc/set-shifting-detail-report')
 adhocSetShiftingSummaryReport = require('./adhoc/set-shifting-summary-report')
 adhocStargazerReport = require('./adhoc/stargazer-report')
+adhocTimingReport = require('./adhoc/timing-report')
 
 
 # stitch together data from the patient view
@@ -81,6 +82,7 @@ exports.lists =
   'adhoc-set-shifting-detail-report': adhocSetShiftingDetailReport.list
   'adhoc-set-shifting-summary-report': adhocSetShiftingSummaryReport.list
   'adhoc-stargazer-report': adhocStargazerReport.list
+  'adhoc-timing-report': adhocTimingReport.list
 
 exports.validate_doc_update = validateDocUpdate
 

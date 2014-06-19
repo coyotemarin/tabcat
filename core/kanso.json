@@ -17,6 +17,7 @@
                 "js/couchdb/adhoc/set-shifting-detail-report.js",
                 "js/couchdb/adhoc/set-shifting-summary-report.js",
                 "js/couchdb/adhoc/stargazer-report.js",
+                "js/couchdb/adhoc/timing-report.js",
                 "js/couchdb/app.js",
                 "js/couchdb/patient.js",
                 "js/vendor/gauss/gauss.js",
