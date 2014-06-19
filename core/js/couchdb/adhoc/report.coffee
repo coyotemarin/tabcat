@@ -34,7 +34,7 @@ exports.requirePatientView = (req) ->
 # use with start() to print headers: start(headers: csvHeaders('my-report'))
 exports.csvHeaders = (reportName) ->
   'Content-Disposition': (
-    "attachment; filename=\"stargazer-report-#{today()}.csv"),
+    "attachment; filename=\"#{reportName}-#{today()}.csv"),
   'Content-Type': 'text/csv'
 
 
