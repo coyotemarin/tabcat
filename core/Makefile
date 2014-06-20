@@ -60,6 +60,7 @@ design.json: kanso.json $(KANSO_DEPS) $(MANIFEST)
 $(PUSHED): design.json
 	../scripts/force-put $< $(TABCAT_HOST)/tabcat/_design/core
 	../scripts/force-put $< $(TABCAT_HOST)/tabcat-data/_design/core
+	../scripts/force-put $< $(TABCAT_HOST)/tabcat-data-replica/_design/core
 	touch $@
 
 ifeq ($(TABCAT_DEBUG), 1)

@@ -42,9 +42,9 @@ HEADERS = [
   'between25',
   'betweenMedian',
   'between75',
-  'ratio25',
-  'ratioMedian',
-  'ratio75',
+  'rhythm25',
+  'rhythmMedian',
+  'rhythm75',
   'firstEvent',
   'timesBetween',
 ])
@@ -57,6 +57,11 @@ EVENT_TYPES = [
 ]
 
 
+# score how close to 1 the ratio between a and b is
+scoreRhythm = (a, b) ->
+  Math.pow(Math.log(a) - Math.log(b), 2)
+
+
 patientHandler = (patientRecord) ->
   for encounter in patientRecord.encounters
     for task in encounter.tasks
@@ -64,21 +69,21 @@ patientHandler = (patientRecord) ->
       times = (
         item.now / 1000 for item in (task.eventLog ? []) \
         when item.now? and item?.event?.type in EVENT_TYPES)
+      # ignore duplicate events
+      times = _.uniq(times, true)
 
       # times between touchstart events
-      timesBetweenRaw = (times[j] - times[j - 1] for j in [1...times.length])
-
-      # ignore duplicate events
-      timesBetween = gauss.Vector(tb for tb in timesBetweenRaw if tb != 0)
+      timesBetween = gauss.Vector(
+        times[j] - times[j - 1] for j in [1...times.length])
 
       # ratio of time between to previous time between
-      timeRatios = gauss.Vector(
-        timesBetween[j] / timesBetween[j - 1] \
+      rhythmScores = gauss.Vector(
+        scoreRhythm(timesBetween[j], timesBetween[j - 1]) \
         for j in [1...timesBetween.length])
 
       data = [
-        patientCode = patientRecord.patientCode
-        encounterNum = encounter.encounterNum
+        patientRecord.patientCode
+        encounter.encounterNum + 1
       ].concat(report.getDataQualityCols(encounter)).concat([
         task.name,
         report.getDate(task),
@@ -88,21 +93,17 @@ patientHandler = (patientRecord) ->
         timesBetween.percentile(0.25),
         timesBetween.median()
         timesBetween.percentile(0.75),
-        timeRatios.percentile(0.25),
-        timeRatios.median(),
-        timeRatios.percentile(0.75),
+        rhythmScores.percentile(0.25),
+        rhythmScores.median(),
+        rhythmScores.percentile(0.75),
       ])
 
       # add raw timing data, starting with time from start of task
       if times.length
         data.push(times[0] - (task.startedAt ? 0) / 1000)
-        data = data.concat(timesBetweenRaw)
+        data = data.concat(timesBetween)
 
-
-      # clean out undef, NaN
-      data = ((if (isNaN(x) or not x?) then null else x) for x in data)
-
-      send(csv.arrayToCsv([data]))
+      report.sendCsvRow(data)
 
 
 exports.list = (head, req) ->

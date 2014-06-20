@@ -24,6 +24,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ###
+csv = require('js/vendor/ucsv')
 
 # used to put prefixes before headers
 exports.requirePatientView = (req) ->
@@ -74,3 +75,20 @@ exports.getDataQualityCols = (encounter) ->
   adminComments = notes?.comments ? null
 
   return [goodForResearch, qualityIssues, adminComments]
+
+
+
+# output a CSV row, replacing undef and NaN with null
+exports.sendCsvRow = (data) ->
+
+  clean = (x) ->
+    if not x?
+      null
+    else if typeof x == 'number' and isNaN(x)
+      null
+    else
+      x
+
+  data = (clean(x) for x in data)
+
+  send(csv.arrayToCsv([data]))
