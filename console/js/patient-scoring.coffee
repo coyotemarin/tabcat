@@ -71,7 +71,7 @@ showScoring = ->
         $encounter.attr('id', "encounter-#{e._id}")
         $encounter.find('.encounterNum').text(
           "Encounter ##{e.encounterNum + 1}")
-        $encounter.find('.date').text(e.year)  # TODO: add full date
+        $encounter.find('.date').text(TabCAT.Encounter.getISODate(e))
 
         $tasks = $encounter.find('.tasks')
 

@@ -114,6 +114,48 @@ TabCAT.Encounter.newDoc = (patientCode, configDoc) ->
   return doc
 
 
+# get the date an encounter occurred, as an ISO 8601 date (YYYY-MM-DD)
+# this is long only because
+TabCAT.Encounter.getISODate = (encounterDoc) ->
+  console.log(JSON.stringify(encounterDoc))
+
+  year = encounterDoc.year
+  month = encounterDoc.limitedPHI?.month
+  day = encounterDoc.limitedPHI?.day
+  clockOffset = encounterDoc.limitedPHI?.clockOffset
+
+  if clockOffset?
+    if month? and day?
+      # JS months start at 0. Check for off-by-one errors on month (#45)
+      startOfDay = Date(year, month - 1, day).getTime()
+      if Math.abs(clockOffset - startOfDay) > 2 * 24 * 60 * 60 * 1000
+        month += 1
+    else
+      # this can happen if we're reading out of the patient view,
+      # which includes clockOffset and year but not month/day
+
+      # TODO: this shows the date in the current time zone, which
+      # may lead to confusing results if the test happened in a very
+      # different time zone. Could be fixed by
+      date = new Date(clockOffset)
+      month = date.getMonth() + 1
+      day = date.getDate()
+
+  if not year?
+    return ''
+
+  yearStr = year.toString()
+
+  if not (month? and day?)
+    return yearStr
+
+  # quick and dirty zero-padding
+  monthStr = (100 + month).toString()[1..]
+  dayStr = (100 + day).toString()[1..]
+
+  return "#{yearStr}-#{monthStr}-#{dayStr}"
+
+
 # Promise: start an encounter and update patient doc and localStorage
 # appropriately. Patient code will always be converted to all uppercase.
 #
