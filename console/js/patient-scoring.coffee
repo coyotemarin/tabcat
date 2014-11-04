@@ -69,8 +69,16 @@ showScoring = ->
 
         $encounter = $(ENCOUNTER_HTML)
         $encounter.attr('id', "encounter-#{e._id}")
-        $encounter.find('.encounterNum').text(
-          "Encounter ##{e.encounterNum + 1}")
+        $encounterNum = $encounter.find('.encounterNum')
+        if e._id == TabCAT.Encounter.getId()
+          $encounterNum.text("Current Encounter (##{e.encounterNum + 1})")
+        else
+          $encounterNum.text("Encounter ##{e.encounterNum + 1}")
+
+        # note that e isn't the full encounter doc; just the part that
+        # appears in the patient view. Currently this lacks the month
+        # and day field, which only matters if the encounter happened
+        # in a very different time zone
         $encounter.find('.date').text(TabCAT.Encounter.getISODate(e))
 
         $tasks = $encounter.find('.tasks')
